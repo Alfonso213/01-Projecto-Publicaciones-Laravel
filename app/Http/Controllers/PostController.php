@@ -26,7 +26,7 @@ class PostController extends Controller
    }
 
    public function destroy(Request $request, Post $post)
-{
+   {
     // Esto te dirá si el objeto $post tiene datos o está vacío
     //dd($post); 
 
@@ -36,5 +36,22 @@ class PostController extends Controller
     \Illuminate\Support\Facades\Gate::authorize('delete', $post);
     $post->delete();
     return back();
-}
+   }
+
+  
+   public function like(Post $post)
+   {
+         // SI el usuario YA hizo like
+         if ($post->likes()->where('user_id', auth()->id())->exists()) {
+            // ENTONCES: elimina el like
+            $post->likes()->where('user_id', auth()->id())->delete();
+         } else {
+            // SINO: agrega un like
+            $post->likes()->create(['user_id' => auth()->id()]);
+         }
+         
+         // Regresa a donde venía
+         
+         return redirect()->route('dashboard');
+   }
 }

@@ -1,7 +1,10 @@
 <div x-data="{
          showShare: false,
          postUrl: '{{ url('/') }}/posts/{{ $post->id }}',
-         copied: false
+         copied: false,
+         liked: {{ $post->likes->contains('user_id', auth()->id()) ? 'true' : 'false' }},
+         likesCount: {{ $post->likes_count }},
+         loading: false
      }"
      x-cloak
      @load="showShare = false">
@@ -18,19 +21,37 @@
         </div>
 
         <div class="flex items-center space-x-1">
-            <!-- Botón de Like -->
-            <form action="{{ route('posts.like', $post->id) }}" method="POST" class="inline">
-                @csrf
-                <button type="submit"
-                        class="flex items-center space-x-1 p-2 rounded-full transition-all duration-200
-                                {{ $post->likes->contains('user_id', auth()->id()) 
-                                    ? 'text-red-500 hover:bg-red-100' 
-                                    : 'text-gray-400 hover:text-red-500 hover:bg-gray-100' }}"
-                        title="Me gusta">
-                    <i class="fa-heart {{ $post->likes->contains('user_id', auth()->id()) ? 'fas' : 'far' }}"></i>
-                    <span class="text-xs font-semibold">{{ $post->likes->count() }}</span>
-                </button>
-            </form>
+            <!-- Botón de Like (AJAX) -->
+            <button @click="async () => {
+                loading = true;
+                try {
+                    const response = await fetch('{{ route('posts.like', $post->id) }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    liked = data.liked;
+                    likesCount = data.likesCount;
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {
+                    loading = false;
+                }
+            }"
+                    :disabled="loading"
+                    class="flex items-center space-x-1 p-2 rounded-full transition-all duration-200 cursor-pointer
+                            disabled:opacity-50"
+                    :class="liked 
+                        ? 'text-red-500 hover:bg-red-100' 
+                        : 'text-gray-400 hover:text-red-500 hover:bg-gray-100'"
+                    title="Me gusta">
+                <i class="fa-heart" :class="liked ? 'fas' : 'far'"></i>
+                <span class="text-xs font-semibold" x-text="likesCount"></span>
+            </button>
 
             <!-- Botón de Compartir -->
             <button type="button" 

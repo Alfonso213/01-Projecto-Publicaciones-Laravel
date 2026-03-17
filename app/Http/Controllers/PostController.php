@@ -11,7 +11,10 @@ class PostController extends Controller
    public function index()
    {
       return view('posts.index', [
-         'posts' => Post::latest()->paginate(),
+         'posts' => Post::with('user')
+            ->withCount('likes')
+            ->latest()
+            ->paginate(),
       ]);
    }
 
@@ -41,17 +44,26 @@ class PostController extends Controller
   
    public function like(Post $post)
    {
-         // SI el usuario YA hizo like
-         if ($post->likes()->where('user_id', auth()->id())->exists()) {
-            // ENTONCES: elimina el like
-            $post->likes()->where('user_id', auth()->id())->delete();
-         } else {
-            // SINO: agrega un like
-            $post->likes()->create(['user_id' => auth()->id()]);
-         }
-         
-         // Regresa a donde venía
-         
-         return redirect()->route('dashboard');
+      $userHasLiked = $post->likes()->where('user_id', auth()->id())->exists();
+      
+      if ($userHasLiked) {
+         // Elimina el like
+         $post->likes()->where('user_id', auth()->id())->delete();
+         $liked = false;
+      } else {
+         // Agrega un like
+         $post->likes()->create(['user_id' => auth()->id()]);
+         $liked = true;
+      }
+      
+      // Recalcular el contador de likes
+      $likesCount = $post->likes()->count();
+      
+      // Retornar JSON para AJAX (sin reload de página)
+      return response()->json([
+         'liked' => $liked,
+         'likesCount' => $likesCount,
+         'message' => $liked ? 'Like agregado' : 'Like removido'
+      ]);
    }
 }

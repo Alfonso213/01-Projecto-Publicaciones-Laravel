@@ -23,10 +23,17 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
+                            <div class="flex-shrink-0 me-3">
+                                <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center shadow-sm">
+                                    <span class="text-white text-sm font-bold uppercase">
+                                        {{ Str::substr(Auth::user()->name, 0, 1) }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="font-semibold text-gray-700">{{ Auth::user()->name }}</div>
 
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <div class="ms-2">
+                                <svg class="fill-current h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </div>
@@ -34,7 +41,14 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="route('profile.edit')"
+                        class="flex items-center text-blue-600 hover:text-blue-700">
+                        <div class="inline-flex items-center justify-center w-6 me-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                                <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM2.046 15.253c-.058.468.172.92.57 1.175A9.953 9.953 0 0 0 8 18c1.982 0 3.83-.578 5.384-1.573.398-.254.628-.707.57-1.175a6.001 6.001 0 0 0-11.908 0ZM12.75 7.75a.75.75 0 0 0 0 1.5h5.5a.75.75 0 0 0 0-1.5h-5.5Z" />
+                            </svg>
+
+                        </div>
                             {{ __('Profile') }}
                         </x-dropdown-link>
 
@@ -43,8 +57,14 @@
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
+                                    class="flex items-center text-red-600 hover:text-red-700"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
+                                <div class="w-6 flex justify-center me-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 me-2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                                    </svg>
+                                </div>
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
                         </form>

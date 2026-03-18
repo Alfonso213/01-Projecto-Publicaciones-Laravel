@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CommentController;
 
 Route::redirect('/','dashboard');
 
@@ -25,6 +26,7 @@ Route::delete('posts/{post}', [PostController::class,'destroy'])->middleware(['a
 Route::post('posts/{post}/likes', [PostController::class,'like'])->middleware(['auth', 'verified'])->name('posts.like');
 Route::get('user/{user}', [UserController::class,'show'])->middleware(['auth', 'verified'])->name('users.show');
 
-
+Route::post('comments', [CommentController::class,'store'])->middleware(['auth', 'verified'])->name('comments.store');
+Route::delete('comments/{comment}', [CommentController::class,'destroy'])->middleware(['auth', 'verified'])->name('comments.destroy');
 
 require __DIR__.'/auth.php';

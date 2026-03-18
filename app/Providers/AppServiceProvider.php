@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use App\Policies\PostPolicy;
+use App\Policies\CommentPolicy;
+use App\Models\Comment;
 
 class AppServiceProvider extends ServiceProvider
 {

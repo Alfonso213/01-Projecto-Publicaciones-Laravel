@@ -78,13 +78,21 @@
                     </button>
                 </form>
             @endcan
+            
+            <!-- Botón de Comentarios -->
+            @include('posts.inc.comments-form')
+    </div>
+           
         </div>
     </div>
+
+    
 
     <div class="mt-3 text-gray-700 leading-relaxed text-sm">
         {{ $post->body }}
     </div>
-    </div>
+
+     
 
     <!-- Overlay de fondo difuminado -->
     <div x-show="showShare"

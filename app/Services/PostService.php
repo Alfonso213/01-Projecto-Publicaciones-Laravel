@@ -7,7 +7,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 class PostService
 {
     /**
-     * Obtiene los posts con sus relaciones y contadores necesarios.
+     * Extrae al vuelo el volumen estadístico de (likes y comentarios) con "withCount",
+     * y precarga los datos en lote ("with") para optimizar las vistas (Muro y Tendencias).
      */
     public function getLatestPosts(int $perPage = 15): LengthAwarePaginator
     {
@@ -18,7 +19,8 @@ class PostService
     }
 
     /**
-     * Obtiene un post específico por ID con sus relaciones.
+     * Idéntico propósito que "getLatestPosts" pero forjado para 
+     * traer una única vista detallada con estadísticas y respuestas precargadas.
      */
     public function getPostById(int $id): Post
     {
@@ -28,7 +30,7 @@ class PostService
     }
 
     /**
-     * Crea una nueva publicación para un usuario.
+     * Aisla la persistencia de un nuevo elemento Post en base de datos.
      */
     public function createPost($user, array $data): Post
     {

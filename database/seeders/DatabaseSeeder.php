@@ -24,14 +24,20 @@ class DatabaseSeeder extends Seeder
     $posts = Post::all();
     // 2. Generar Comentarios (3 por post) con 4-12 likes cada uno
     $posts->each(function ($post) use ($users) {
-        $comments = Comment::factory(3)->create(['post_id' => $post->id, 'user_id' => $users->random()->id]);
-        $comments->each(function ($comment) use ($users) {
+        // En lugar de crear 3 de golpe con el mismo usuario,
+        // creamos 3 comentarios individuales, cada uno con un usuario random.
+        for ($i = 0; $i < 3; $i++) {
+            $comment = Comment::factory()->create([
+                'post_id' => $post->id, 
+                'user_id' => $users->random()->id
+            ]);
+            // Añadimos los likes a este comentario individual
             $numLikes = mt_rand(4, 12);
             $randomUsers = $users->random($numLikes);
             foreach ($randomUsers as $u) {
                 $comment->likes()->firstOrCreate(['user_id' => $u->id]);
             }
-        });
+        }
     });
     // 3. Restaurar Likes MASIVOS para Posts (50-70% de saturación)
     $maxLikes = $users->count() * $posts->count();

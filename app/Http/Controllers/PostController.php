@@ -40,6 +40,12 @@ class PostController extends Controller
         return response()->json($result);
     }
 
+    public function show($id)
+    {
+        $post = $this->postService->getPostById($id);
+        return view('posts.show', compact('post'));
+    }
+
     public function destroy(Post $post)
     {
         Gate::authorize('delete', $post);

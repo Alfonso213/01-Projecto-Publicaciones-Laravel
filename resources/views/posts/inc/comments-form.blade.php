@@ -1,5 +1,5 @@
-<div x-data="comentariosForm({{ $post->id }})" class="mt-8 border-t border-gray-100 pt-6">
-    <h3 class="text-lg font-bold text-gray-900 mb-4">Comentarios</h3>
+<div x-data="comentariosForm({{ $post->id }})" class="mt-8 border-t border-gray-100 dark:border-slate-800 pt-6">
+    <h3 class="text-lg font-bold text-gray-900 dark:text-slate-100 mb-4">Comentarios</h3>
 
     {{-- Formulario para nuevo comentario --}}
     <form @submit.prevent="enviarComentario" class="mb-8">
@@ -7,7 +7,7 @@
             <textarea 
                 x-model="body" 
                 rows="3" 
-                class="w-full border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-3"
+                class="w-full border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-3 placeholder-gray-400 dark:placeholder-slate-500"
                 placeholder="Escribe un comentario..."
                 required>
             </textarea>
@@ -26,13 +26,13 @@
     {{-- Listado de comentarios --}}
     <div class="space-y-4">
         @forelse($post->comments as $comment)
-            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+            <div class="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg border border-gray-100 dark:border-slate-800">
                 <div class="flex justify-between items-start">
                     <div>
-                        <span class="font-bold text-gray-900 text-sm">
+                        <span class="font-bold text-gray-900 dark:text-slate-100 text-sm">
                             {{ $comment->user->name }}
                         </span>
-                        <span class="text-xs text-gray-500 ml-2">
+                        <span class="text-xs text-gray-500 dark:text-slate-400 ml-2">
                             {{ $comment->created_at->diffForHumans() }}
                         </span>
                     </div>
@@ -50,7 +50,7 @@
                     @endcan
                 </div>
 
-                <p class="mt-2 text-sm text-gray-700">
+                <p class="mt-2 text-sm text-gray-700 dark:text-slate-300">
                     {{ $comment->body }}
                 </p>
 
@@ -75,10 +75,10 @@
                             liked = data.liked;
                             likesCount = data.likesCount;
                         } catch (e) { console.error(e) } finally { loading = false }
-                    " class="flex items-center space-x-1 text-xs transition-colors p-1 rounded-md hover:bg-white"
-                    :class="liked ? 'text-red-500 font-bold' : 'text-gray-400 hover:text-red-400'">
-                        <i class="fa-heart" :class="liked ? 'fas' : 'far'"></i>
-                        <span x-text="likesCount"></span>
+                    " class="flex items-center space-x-1 text-xs transition-colors p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800"
+                    :class="liked ? 'bg-gray-100 dark:bg-slate-800' : 'text-gray-400 dark:text-slate-500'">
+                        <i class="fa-heart" :class="liked ? 'fas text-red-500' : 'far hover:text-red-500'"></i>
+                        <span :class="liked ? 'font-bold text-gray-900 dark:text-slate-100' : 'hover:text-slate-300'" x-text="likesCount"></span>
                     </button>
                 </div>
             </div>

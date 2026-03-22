@@ -7,21 +7,28 @@
          loading: false
      }"
      x-cloak
-     class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+     class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 mb-6 transition-colors duration-300">
     
     <!-- CABECERA: Autor y Acciones rápidas -->
     <div class="flex justify-between items-start mb-4">
         <div>
             <a href="{{ route('users.show', $post->user->id) }}" 
-               class="text-gray-900 font-bold hover:text-indigo-600 transition-colors text-lg">
+               class="text-gray-900 dark:text-slate-100 font-bold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 text-lg">
                 {{ $post->user->name }}
             </a>
-            <p class="text-gray-500 text-xs mt-0.5">
+            <p class="text-gray-500 dark:text-slate-400 text-xs mt-0.5 transition-colors duration-300">
                 {{ $post->created_at->diffForHumans() }}
             </p>
         </div>
 
         <div class="flex items-center space-x-2">
+            <!-- Botón de Comentarios (Pill) -->
+            <a href="{{ route('posts.show', $post->id) }}" 
+               class="flex items-center space-x-1.5 p-2 rounded-lg text-gray-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all">
+                <i class="far fa-comment text-lg"></i>
+                <span class="text-sm font-bold">{{ $post->comments_count }}</span>
+            </a>
+
             <!-- Like -->
             <button @click="async () => {
                 loading = true;
@@ -40,10 +47,10 @@
                 } catch (error) { console.error('Error:', error); } finally { loading = false; }
             }"
             :disabled="loading"
-            class="flex items-center space-x-1.5 p-2 rounded-lg transition-all"
-            :class="liked ? 'text-red-500 bg-red-50' : 'text-gray-400 hover:bg-gray-100'">
-                <i class="fa-heart text-lg" :class="liked ? 'fas' : 'far'"></i>
-                <span class="text-sm font-bold" x-text="likesCount"></span>
+            class="flex items-center space-x-1.5 p-2 rounded-lg transition-all hover:bg-gray-100 dark:hover:bg-slate-800"
+            :class="liked ? 'bg-gray-100 dark:bg-slate-800' : 'text-gray-400 dark:text-slate-500'">
+                <i class="fa-heart text-lg" :class="liked ? 'fas text-red-500' : 'far hover:text-red-500'"></i>
+                <span class="text-sm font-bold" :class="liked ? 'text-gray-900 dark:text-slate-100' : 'hover:text-slate-300'" x-text="likesCount"></span>
             </button>
 
             <!-- Compartir -->
@@ -65,14 +72,16 @@
     </div>
 
     <!-- CUERPO DEL POST -->
-    <div class="text-gray-800 text-base leading-relaxed mb-6">
+    <div class="text-gray-800 dark:text-slate-200 text-base leading-relaxed mb-6 transition-colors duration-300">
         {{ $post->body }}
     </div>
 
-    <!-- SECCIÓN DE COMENTARIOS -->
-    <div class="mt-6 border-t border-gray-100 pt-4">
-        @include('posts.inc.comments-form')
-    </div>
+    <!-- SECCIÓN DE COMENTARIOS (Solo visible en vista detalle) -->
+    @if(isset($showComments) && $showComments)
+        <div class="mt-6 border-t border-gray-100 pt-4">
+            @include('posts.inc.comments-form')
+        </div>
+    @endif
 
     <!-- MODAL DE COMPARTIR CON TELEPORT (Optimización de rendimiento) -->
     <template x-teleport="body">
@@ -96,7 +105,7 @@
                  x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="opacity-100 scale-100"
                  x-transition:leave-end="opacity-0 scale-90"
-                 class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white rounded-2xl shadow-2xl z-[110] p-6">
+                 class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl z-[110] p-6 border border-gray-100 dark:border-slate-800">
                 
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-lg font-bold text-gray-900">Compartir publicación</h3>

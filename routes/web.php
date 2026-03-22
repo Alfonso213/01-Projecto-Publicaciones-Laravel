@@ -23,6 +23,7 @@ Route::get('trending', [PostController::class,'index'])->middleware(['auth', 've
 Route::post('posts', [PostController::class,'store'])->middleware(['auth', 'verified'])->name('posts.store');
 Route::delete('posts/{post}', [PostController::class,'destroy'])->middleware(['auth', 'verified'])->name('posts.destroy');
 
+Route::get('posts/{post}', [PostController::class,'show'])->middleware(['auth', 'verified'])->name('posts.show');
 Route::post('posts/{post}/likes', [PostController::class,'like'])->middleware(['auth', 'verified'])->name('posts.like');
 Route::get('user/{user}', [UserController::class,'show'])->middleware(['auth', 'verified'])->name('users.show');
 

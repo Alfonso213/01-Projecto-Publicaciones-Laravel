@@ -10,7 +10,8 @@ class UserController extends Controller
     public function show(User $user)
     {
         return view('users.show', [
-         'posts' => $user->posts()->latest()->paginate()
-      ]);
+            'user' => $user,
+            'posts' => $user->posts()->with(['user'])->withCount(['likes', 'comments'])->latest()->paginate()
+        ]);
     }
 }

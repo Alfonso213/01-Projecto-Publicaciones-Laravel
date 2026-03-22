@@ -29,4 +29,6 @@ Route::get('user/{user}', [UserController::class,'show'])->middleware(['auth', '
 Route::post('comments', [CommentController::class,'store'])->middleware(['auth', 'verified'])->name('comments.store');
 Route::delete('comments/{comment}', [CommentController::class,'destroy'])->middleware(['auth', 'verified'])->name('comments.destroy');
 
+Route::post('comments/{comment}/likes', [CommentController::class, 'like'])->middleware(['auth', 'verified'])->name('comments.like');
+
 require __DIR__.'/auth.php';

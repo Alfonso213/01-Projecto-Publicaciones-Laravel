@@ -1,6 +1,7 @@
 <div x-data="comentariosForm({{ $post->id }})" class="mt-8 border-t border-gray-100 pt-6">
     <h3 class="text-lg font-bold text-gray-900 mb-4">Comentarios</h3>
 
+    {{-- Formulario para nuevo comentario --}}
     <form @submit.prevent="enviarComentario" class="mb-8">
         <div class="mb-3">
             <textarea 
@@ -22,11 +23,11 @@
         </div>
     </form>
 
+    {{-- Listado de comentarios --}}
     <div class="space-y-4">
         @forelse($post->comments as $comment)
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
                 <div class="flex justify-between items-start">
-                    
                     <div>
                         <span class="font-bold text-gray-900 text-sm">
                             {{ $comment->user->name }}
@@ -52,6 +53,34 @@
                 <p class="mt-2 text-sm text-gray-700">
                     {{ $comment->body }}
                 </p>
+
+                {{-- BLOQUE DE LIKES (SISTEMA POLIMÓRFICO) --}}
+                <div x-data="{ 
+                    liked: {{ $comment->likes->contains('user_id', auth()->id()) ? 'true' : 'false' }},
+                    likesCount: {{ $comment->likes_count ?? $comment->likes->count() }},
+                    loading: false
+                }" class="mt-3 flex items-center">
+                    <button @click="
+                        if(loading) return;
+                        loading = true;
+                        try {
+                            const response = await fetch('{{ route('comments.like', $comment->id) }}', {
+                                method: 'POST',
+                                headers: { 
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json'
+                                }
+                            });
+                            const data = await response.json();
+                            liked = data.liked;
+                            likesCount = data.likesCount;
+                        } catch (e) { console.error(e) } finally { loading = false }
+                    " class="flex items-center space-x-1 text-xs transition-colors p-1 rounded-md hover:bg-white"
+                    :class="liked ? 'text-red-500 font-bold' : 'text-gray-400 hover:text-red-400'">
+                        <i class="fa-heart" :class="liked ? 'fas' : 'far'"></i>
+                        <span x-text="likesCount"></span>
+                    </button>
+                </div>
             </div>
         @empty
             <p class="text-sm text-gray-500 text-center py-4">Aún no hay comentarios. ¡Sé el primero en comentar!</p>
@@ -67,11 +96,9 @@
 
             async enviarComentario() {
                 if (!this.body.trim()) return;
-                
                 this.cargando = true;
 
                 try {
-                    // Petición AJAX (usando Fetch API)
                     const response = await fetch(`{{ route('comments.store') }}`, {
                         method: 'POST',
                         headers: {
@@ -79,16 +106,11 @@
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                             'Accept': 'application/json'
                         },
-                        body: JSON.stringify({
-                            post_id: postId,
-                            body: this.body
-                        })
+                        body: JSON.stringify({ post_id: postId, body: this.body })
                     });
 
                     if (response.ok) {
-                        this.body = ''; // Limpiar el textarea
-                        // Aquí idealmente recargarías la lista de comentarios o añadirías el nuevo al DOM dinámicamente.
-                        // Por simplicidad en este paso, recargamos la página para ver el nuevo comentario.
+                        this.body = '';
                         window.location.reload(); 
                     } else {
                         alert('Hubo un error al enviar el comentario.');

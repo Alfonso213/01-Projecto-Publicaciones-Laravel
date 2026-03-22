@@ -1,69 +1,50 @@
 <?php
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\Post;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Services\PostService;
+use App\Services\LikeService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
-   use AuthorizesRequests;
-   public function index()
-   {
-      return view('posts.index', [
-         'posts' => Post::with('user','comments.user')
-            ->withCount('likes')
-            ->latest()
-            ->paginate(),
-      ]);
-   }
+    protected $postService;
+    protected $likeService;
 
-   public function store(Request $request)
-   {
-      $request->validate(['body' => 'required']);
+    // Inyección de dependencias en el constructor
+    public function __construct(PostService $postService, LikeService $likeService)
+    {
+        $this->postService = $postService;
+        $this->likeService = $likeService;
+    }
 
-      //dd($request->only('body'));
+    public function index()
+    {
+        $posts = $this->postService->getLatestPosts();
+        return view('posts.index', compact('posts'));
+    }
 
-      $request->user()->posts()->create($request->only('body'));
-      return back()->with('status', 'Publicacion guardada exitosamente');
-   }
+    public function store(Request $request)
+    {
+        $request->validate(['body' => 'required']);
+        $this->postService->createPost($request->user(), $request->only('body'));
+        
+        return back()->with('status', 'Publicación guardada exitosamente');
+    }
 
-   public function destroy(Request $request, Post $post)
-   {
-    // Esto te dirá si el objeto $post tiene datos o está vacío
-    //dd($post); 
+    public function like(Post $post)
+    {
+        $result = $this->likeService->toggleLike($post, auth()->id());
+        return response()->json($result);
+    }
 
-    // Esto te dirá si los IDs coinciden
-    //dd($request->user()->id, $post->user_id);
-
-    \Illuminate\Support\Facades\Gate::authorize('delete', $post);
-    $post->delete();
-    return back();
-   }
-
-  
-   public function like(Post $post)
-   {
-      $userHasLiked = $post->likes()->where('user_id', auth()->id())->exists();
-      
-      if ($userHasLiked) {
-         // Elimina el like
-         $post->likes()->where('user_id', auth()->id())->delete();
-         $liked = false;
-      } else {
-         // Agrega un like
-         $post->likes()->create(['user_id' => auth()->id()]);
-         $liked = true;
-      }
-      
-      // Recalcular el contador de likes
-      $likesCount = $post->likes()->count();
-      
-      // Retornar JSON para AJAX (sin reload de página)
-      return response()->json([
-         'liked' => $liked,
-         'likesCount' => $likesCount,
-         'message' => $liked ? 'Like agregado' : 'Like removido'
-      ]);
-   }
+    public function destroy(Post $post)
+    {
+        Gate::authorize('delete', $post);
+        $post->delete();
+        return back();
+    }
 }
+

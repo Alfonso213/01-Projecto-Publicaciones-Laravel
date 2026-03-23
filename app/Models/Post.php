@@ -2,12 +2,13 @@
 
 namespace App\Models;
 use App\Traits\Likeable;
+use App\Traits\Trendable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory; 
 
 class Post extends Model
 {
-    use HasFactory, Likeable;
+    use HasFactory, Likeable, Trendable;
     
     // Lista de atributos que permiten la asignación masiva desde formulario
     protected $fillable = ['body',];

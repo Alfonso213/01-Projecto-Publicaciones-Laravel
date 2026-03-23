@@ -36,25 +36,17 @@ class PostService
     public function getTrendingComments(int $limit = 10)
     {
         return Comment::with(['user', 'post.user'])
-            ->withCount(['likes' => function($query) {
-                $query->where('created_at', '>=', now()->subDay());
-            }])
-            ->orderByDesc('likes_count')
+            ->popularLast24Hours() // Trait
+            ->withCount('likes')
             ->take($limit)
             ->get();
     }
 
-    /**
-     * Obtiene los posts con más likes en las últimas 24 horas.
-     */
     public function getTrendingPosts(int $limit = 10)
     {
         return Post::with(['user'])
-            ->withCount(['likes' => function($query) {
-                $query->where('created_at', '>=', now()->subDay());
-            }])
-            ->withCount('comments')
-            ->orderByDesc('likes_count')
+            ->popularLast24Hours() // Trait
+            ->withCount('likes','comments')
             ->take($limit)
             ->get();
     }

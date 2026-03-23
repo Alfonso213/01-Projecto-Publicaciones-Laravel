@@ -6,19 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Like extends Model
 {
-
-    protected $fillable = ['user_id', 'post_id'];
+    // Ahora permitimos los campos polimórficos y eliminamos post_id
+    protected $fillable = ['user_id', 'likeable_id', 'likeable_type'];
     
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function likeable() { 
+    // Definición correcta de la relación polimórfica
+    public function likeable() 
+    { 
         return $this->morphTo(); 
     }
 
-    public function post(){
-        return $this ->belongsTo(Post::class);
+    // Acceso directo al Post si el likeable es un Post
+    public function post()
+    {
+        return $this->belongsTo(Post::class, 'likeable_id')->where('likeable_type', Post::class);
     }
 }

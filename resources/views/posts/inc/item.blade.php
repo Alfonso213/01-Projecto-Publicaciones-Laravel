@@ -4,7 +4,17 @@
          copied: false,
          liked: {{ $post->likes->contains('user_id', auth()->id()) ? 'true' : 'false' }},
          likesCount: {{ $post->likes_count }},
-         loading: false
+         loading: false,
+         postId: {{ $post->id }},
+         init() {
+             // Escuchamos el evento de broadcasting
+             window.Echo.channel('posts')
+                 .listen('.post.liked', (e) => {
+                     if (e.post.id === this.postId) {
+                         this.likesCount = e.likesCount;
+                     }
+                 });
+         }
      }"
      x-cloak
      class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 mb-6 transition-colors duration-300">
@@ -83,7 +93,7 @@
         </div>
     @endif
 
-    <!-- MODAL DE COMPARTIR CON TELEPORT (Optimización de rendimiento) -->
+    <!-- MODAL DE COMPARTIR CON TELEPORT  -->
     <template x-teleport="body">
         <div x-show="showShare" class="relative z-[100]">
             <!-- Fondo oscuro (Overlay) -->

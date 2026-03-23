@@ -21,21 +21,22 @@
                         {{ __('Trending') }}
                     </x-nav-link>
                 </div>
-                
+
             </div>
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
+
                 <!-- Selector de Tema (Moon/Sun) -->
                 <div x-data="{ 
                     dark: localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-                }" x-init="$watch('dark', val => {
+                    }" x-init="$watch('dark', val => {
                     localStorage.theme = val ? 'dark' : 'light';
                     if (val) document.documentElement.classList.add('dark');
                     else document.documentElement.classList.remove('dark');
                 })" class="flex items-center mr-4">
-                    <button @click="dark = !dark" 
-                            class="p-2 rounded-lg bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-all border border-gray-100 dark:border-slate-700">
+                    <button @click="dark = !dark"
+                        class="p-2 rounded-lg bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-all border border-gray-100 dark:border-slate-700">
                         <i class="fas" :class="dark ? 'fa-sun' : 'fa-moon'"></i>
                     </button>
                 </div>
@@ -62,13 +63,13 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')"
-                        class="flex items-center text-blue-600 hover:text-blue-700">
-                        <div class="inline-flex items-center justify-center w-6 me-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
-                                <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM2.046 15.253c-.058.468.172.92.57 1.175A9.953 9.953 0 0 0 8 18c1.982 0 3.83-.578 5.384-1.573.398-.254.628-.707.57-1.175a6.001 6.001 0 0 0-11.908 0ZM12.75 7.75a.75.75 0 0 0 0 1.5h5.5a.75.75 0 0 0 0-1.5h-5.5Z" />
-                            </svg>
+                            class="flex items-center text-blue-600 hover:text-blue-700">
+                            <div class="inline-flex items-center justify-center w-6 me-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                                    <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM2.046 15.253c-.058.468.172.92.57 1.175A9.953 9.953 0 0 0 8 18c1.982 0 3.83-.578 5.384-1.573.398-.254.628-.707.57-1.175a6.001 6.001 0 0 0-11.908 0ZM12.75 7.75a.75.75 0 0 0 0 1.5h5.5a.75.75 0 0 0 0-1.5h-5.5Z" />
+                                </svg>
 
-                        </div>
+                            </div>
                             {{ __('Profile') }}
                         </x-dropdown-link>
 
@@ -77,8 +78,8 @@
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
-                                    class="flex items-center text-red-600 hover:text-red-700"
-                                    onclick="event.preventDefault();
+                                class="flex items-center text-red-600 hover:text-red-700"
+                                onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                 <div class="w-6 flex justify-center me-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 me-2">
@@ -90,6 +91,7 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
+
             </div>
 
             <!-- Hamburger -->
@@ -123,13 +125,13 @@
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
-                
+
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
+                        onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>

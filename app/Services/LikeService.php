@@ -1,18 +1,13 @@
 <?php
 namespace App\Services;
-
+use App\Events\PostLiked;
+use App\Models\Post;
 use Illuminate\Database\Eloquent\Model;
-
 class LikeService
 {
-    /**
-     * Alterna el estado de un Like de forma polimórfica.
-     * Acepta cualquier Modelo (Post o Comment).
-     */
     public function toggleLike(Model $model, int $userId): array
     {
         $like = $model->likes()->where('user_id', $userId)->first();
-
         if ($like) {
             $like->delete();
             $liked = false;
@@ -20,10 +15,14 @@ class LikeService
             $model->likes()->create(['user_id' => $userId]);
             $liked = true;
         }
-
+        $likesCount = $model->likes()->count();
+        // Si el modelo es un Post, disparamos evento de tiempo real
+        if ($model instanceof Post) {
+            broadcast(new PostLiked($model, $likesCount))->toOthers();
+        }
         return [
             'liked' => $liked,
-            'likesCount' => $model->likes()->count(),
+            'likesCount' => $likesCount,
             'message' => $liked ? 'Like agregado' : 'Like removido'
         ];
     }

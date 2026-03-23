@@ -26,8 +26,14 @@ class PostController extends Controller
     /**
      * Muestra el muro principal (Dashboard) cargando los posts recientes.
      */
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
+        if ($request->routeIs('trending')) {
+            $trendingComments = $this->postService->getTrendingComments();
+            $trendingPosts = $this->postService->getTrendingPosts();
+            
+            return view('posts.trending', compact('trendingComments', 'trendingPosts'));
+        }
         $posts = $this->postService->getLatestPosts();
         return view('posts.index', compact('posts'));
     }

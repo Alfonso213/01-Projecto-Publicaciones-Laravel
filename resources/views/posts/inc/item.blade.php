@@ -4,6 +4,7 @@
          copied: false,
          liked: {{ $post->likes->contains('user_id', auth()->id()) ? 'true' : 'false' }},
          likesCount: {{ $post->likes_count }},
+         commentsCount: {{ $post->comments_count }},
          loading: false,
          postId: {{ $post->id }},
          init() {
@@ -12,6 +13,11 @@
                  .listen('.post.liked', (e) => {
                      if (e.post.id === this.postId) {
                          this.likesCount = e.likesCount;
+                     }
+                 })
+                 .listen('.comment.created', (e) => {
+                     if (e.post.id === this.postId) {
+                         this.commentsCount = e.commentsCount;
                      }
                  });
          }
@@ -36,7 +42,7 @@
             <a href="{{ route('posts.show', $post->id) }}" 
                class="flex items-center space-x-1.5 p-2 rounded-lg text-gray-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all">
                 <i class="far fa-comment text-lg"></i>
-                <span class="text-sm font-bold">{{ $post->comments_count }}</span>
+                <span class="text-sm font-bold" x-text="commentsCount"></span>
             </a>
 
             <!-- Like -->

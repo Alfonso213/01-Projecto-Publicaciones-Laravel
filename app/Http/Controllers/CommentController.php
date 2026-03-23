@@ -5,9 +5,11 @@ use App\Models\Comment;
 use App\Services\LikeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Events\CommentCreated;
 
 class CommentController extends Controller
 {
+    
     protected $likeService;
 
     /**
@@ -35,25 +37,23 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        // Validación de cuerpo (body) y existencia del post al que pertenece
         $request->validate([
             'body' => 'required',
             'post_id' => 'required|exists:posts,id'
         ]);
-
-        // Creación del comentario con todas sus relaciones
-        $request->user()->comments()->create([
+        $comment = $request->user()->comments()->create([
             'body' => $request->body,
             'post_id' => $request->post_id
         ]);
-
-        // Devolvemos JSON para JS integrado
+        // Notificamos el cambio de contador a los demás
+        $post = $comment->post;
+        broadcast(new CommentCreated($post, $post->comments()->count()))->toOthers();
         if ($request->wantsJson()) {
             return response()->json(['message' => 'Comentario guardado']);
         }
         return back()->with('status', 'Comentario guardado exitosamente');
     }
-
+    
     /**
      * Elimina el comentario utilizando confirmación de capa de seguridad (Policy).
      * Asegura que sólo el autor (o administradores autorizados) puedan borrarlo.

@@ -1,13 +1,13 @@
 <?php
 
 namespace App\Models;
-
+use App\Traits\Likeable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory; 
 
 class Post extends Model
 {
-    use HasFactory;
+    use HasFactory, Likeable;
     
     // Lista de atributos que permiten la asignación masiva desde formulario
     protected $fillable = ['body',];
@@ -23,16 +23,6 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    /**
-     * Relación Polimórfica: Likes (Un Post, al igual que un comentario,
-     * puede recibir multitud de likes en la tabla polimórfica)
-     */
-    public function likes()
-    {
-        return $this->morphMany(Like::class, 'likeable');
-    }
-
     /**
      * Relación: Entidad 1-a-N para asociar directamente el Post con todos sus Comentarios.
      */

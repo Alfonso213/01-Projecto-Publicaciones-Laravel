@@ -1,14 +1,14 @@
 <?php
 
 namespace App\Models;
-
+use App\Traits\Likeable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory; 
 
 
 class Comment extends Model
 {   
-    use HasFactory;
+    use HasFactory, Likeable;
     protected $fillable = ['body', 'post_id', 'user_id'];
 
     public function post()
@@ -20,10 +20,4 @@ class Comment extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    public function likes()
-    {
-        return $this->morphMany(Like::class, 'likeable');
-    }
-
 }

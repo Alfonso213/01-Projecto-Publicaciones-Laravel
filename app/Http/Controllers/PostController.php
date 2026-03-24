@@ -1,65 +1,51 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Services\PostService;
-use App\Services\LikeService;
+use App\Http\Requests\StorePostRequest; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
     protected $postService;
-    protected $likeService;
 
-    /**
-     * Constructor: Inyecta los servicios de dominio (PostService, LikeService)
-     * para separar la lógica de negocio compleja del flujo HTTP.
-     */
-    public function __construct(PostService $postService, LikeService $likeService)
-    {
+    public function __construct(PostService $postService) {
         $this->postService = $postService;
-        $this->likeService = $likeService;
     }
 
-    /**
-     * Muestra el muro principal (Dashboard) cargando los posts recientes.
-     */
-    public function index(\Illuminate\Http\Request $request)
-    {
+    public function index(Request $request) {
         if ($request->routeIs('trending')) {
-            $trendingComments = $this->postService->getTrendingComments();
-            $trendingPosts = $this->postService->getTrendingPosts();
-            
-            return view('posts.trending', compact('trendingComments', 'trendingPosts'));
+            $data = [
+                'posts' => $this->postService->getTrendingPosts(),
+                'trendingComments' => $this->postService->getTrendingComments()
+            ];
+            return view('posts.trending', $data);
         }
-        $posts = $this->postService->getLatestPosts();
-        return view('posts.index', compact('posts'));
+        return view('posts.index', ['posts' => $this->postService->getLatestPosts()]);
     }
 
-    /**
-     * Valida y almacena una nueva publicación, relacionándola con el usuario activo.
-     */
-    public function store(Request $request)
-    {
-        $request->validate(['body' => 'required']);
-        $this->postService->createPost($request->user(), $request->only('body'));
-        
-        return back()->with('status', 'Publicación guardada exitosamente');
-    }
+    public function store(StorePostRequest $request) {
+        // Al entrar aquí, los datos ya están validados automáticamente
+        $this->postService->createPost($request->user(), $request->validated());
 
-    /**
-     * Endpoint API (vía AlpineJS): Alterna (crea o elimina) el Like del usuario actual en un Post.
-     * Retorna JSON con el conteo actualizado y el estado de la acción.
-     */
-    public function like(Post $post)
-    {
-        $result = $this->likeService->toggleLike($post, auth()->id());
+        return back()->with('status', 'Publicación creada exitosamente');
+    }
+    //Se añade los request reitando la logica de validacion del controlador
+    public function like(Post $post, Request $request) {
+        $likeService = app(\App\Services\LikeService::class);
+        $result = $likeService->toggleLike($post, $request->user()->id);
         return response()->json($result);
     }
 
-    /**
+    public function destroy(Post $post) {
+        Gate::authorize('delete', $post);
+        $post->delete();
+        return back()->with('status', 'Publicación eliminada');
+    }
+        /**
      * Muestra la vista de detalle de una sola publicación y sus comentarios.
      */
     public function show($id)
@@ -68,14 +54,6 @@ class PostController extends Controller
         return view('posts.show', compact('post'));
     }
 
-    /**
-     * Elimina el Post. Utiliza "Gate::authorize" y el "PostPolicy" para
-     * bloquear el borrado a un usuario que no sea el autor original.
-     */
-    public function destroy(Post $post)
-    {
-        Gate::authorize('delete', $post);
-        $post->delete();
-        return back();
-    }
+    
 }
+
